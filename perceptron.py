@@ -78,14 +78,8 @@ def train_perceptron_on_digits():
     y = y[(y == 0) | (y == 1)]
 
     # Split the data into training, validation, and test sets
-    X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=0.25, random_state=42)
-
-    # Standardize the features
-    #scaler = StandardScaler()
-    #X_train = scaler.fit_transform(X_train)
-    #X_val = scaler.transform(X_val)
-    #X_test = scaler.transform(X_test)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.7, random_state=42)
+    X_val, X_test, y_val, y_test = train_test_split(X_val, y_val, train_size=0.6, random_state=42)
 
     # Initialize and train the perceptron
     perceptron = Perceptron(alpha=0.01, epochs=1000)
