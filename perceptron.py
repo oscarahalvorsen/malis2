@@ -4,9 +4,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Perceptron as SklearnPerceptron
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.datasets import load_digits
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.preprocessing import StandardScaler
 
 
 class Perceptron:
@@ -78,11 +75,11 @@ def train_perceptron_on_digits():
     y = y[(y == 0) | (y == 1)]
 
     # Split the data into training, validation, and test sets
-    X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.7, random_state=42)
-    X_val, X_test, y_val, y_test = train_test_split(X_val, y_val, train_size=0.6, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.8)
+    X_val, X_test, y_val, y_test = train_test_split(X_val, y_val, train_size=0.8)
 
     # Initialize and train the perceptron
-    perceptron = Perceptron(alpha=0.01, epochs=1000)
+    perceptron = Perceptron(alpha=0.1, epochs=1000)
     perceptron.fit(X_train, y_train)
 
     # Use the validation set to choose the model
@@ -92,6 +89,16 @@ def train_perceptron_on_digits():
     # Report the selected model’s accuracy using the testing set
     y_test_pred = perceptron.predict(X_test)
     print(f"Test Accuracy: {accuracy_score(y_test, y_test_pred)}")
+
+    # Compare with sklearn’s Perceptron
+    sklearn_perceptron = SklearnPerceptron(alpha=0.01, random_state=0)
+    sklearn_perceptron.fit(X_train, y_train)
+
+    y_val_pred_sklearn = sklearn_perceptron.predict(X_val)
+    y_test_pred_sklearn = sklearn_perceptron.predict(X_test)
+
+    print(f"Validation Accuracy (Sklearn): {accuracy_score(y_val, y_val_pred_sklearn)}")
+    print(f"Test Accuracy (Sklearn): {accuracy_score(y_test, y_test_pred_sklearn)}")
 
 
 def main():
