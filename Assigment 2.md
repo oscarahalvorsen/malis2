@@ -52,12 +52,10 @@ $$\frac{\partial f}{\partial x} = \frac{1}{1 + x^T x} * 2x = \frac{2x}{1 + x^T x
 
 The dimension of this derivative is $1 \times D$, with 1 output and D inputs.
 
-The derivative of $\sin(z)$ with respect to $z$ is $\cos(z)$ and the derivative of $Ax + b$ with respect to $x$ is $A$. Therefore:
-$$\frac{\partial f}{\partial x} = \cos(Ax + b) * A$$
-The resulting derivative is a matrix of dimensions $E \times D$, the same as the dimension of $A$, since the dimension of the $sin$ are $E \times E$ that multiplied by the matrix $A$ of size $E \times D$ will result in a matrix of dimension $E \times D$.
-
-
-# Still WIP
+The derivative of $\sin(z)$ with respect to $z$ is $\cos(z)$ and the derivative of $Ax + b$ with respect to $x$ is $A$. When we apply a function element-wise to a vector $N\times 1$, the derivative is a diagonal $N\times N$ matrix which has as diagonal the derivative $f'$ applied to $X$ elementwise. Therefore:
+$$\frac{\partial f}{\partial x} = diag(\cos(Ax + b)) * A$$
+The size of cos(.) is the same as sin(.), or $E\times 1$, hence we would have $(E×1)(E×D)$ that doesn't agree but the matrix $diag(cos(...))$ would have the right dimensions.
+The resulting derivative then, is a matrix of dimensions $E \times D$, the same as the dimension of $A$, that is $E \times E$ multiplied by the matrix $A$ of size $E \times D$ which will result in a matrix of dimension $E \times D$.
 ## Exercise 5.8
 Compute the derivatives $\frac{df}{dx}$ of the following functions. Describe your steps in detail. 
 1. Use the chain rule. Provide the dimensions of every single partial derivative.
@@ -65,18 +63,20 @@ Compute the derivatives $\frac{df}{dx}$ of the following functions. Describe you
 	$z =g(y) = y^⊤S^{−1}y$
 	$y =h(x) =x−\mu$
 	where $x,\mu \in R^D, S \in R^{D×D}$
+
 2. $f(x) = tr(xx^⊤ +\sigma^2I), x \in R^D$
    Here tr(A) is the trace of A, i.e., the sum of the diagonal elements $A_{ii}$. Hint: Explicitly write out the outer product.
+   
 3. Use the chain rule. Provide the dimensions of every single partial derivative. You do not need to compute the product of the partial derivatives explicitly.
    $f =tanh(z) \in R^M$ 
    $z =Ax+b, x\in R^N,A\in R^{M×N},b\in R^M$
    Here, $tanh(\cdot)$ is applied to every component of z.
 
-1. The derivative of $\exp(-\frac{1}{2}z)$ with respect to $z$ is $-\frac{1}{2}\exp(-\frac{1}{2}z)$, the derivative of $y^TS^{-1}y$ with respect to $y$ is $2S^{-1}y$, and the derivative of $x - \mu$ with respect to $x$ is 1.
+1. The derivative of $\exp(-\frac{1}{2}z)$ with respect to $z$ is $-\frac{1}{2}\exp(-\frac{1}{2}z)$, the derivative of $y^TS^{-1}y$ with respect to $y$ is $(S^{-1} + S^{-T}) y$, and the derivative of $x - \mu$ with respect to $x$ is 1.
 
    Applying the chain rule, we get:
 
-   $\frac{\partial f}{\partial x} = -\frac{1}{2}\exp(-\frac{1}{2}y^TS^{-1}y) * 2S^{-1}(x - \mu) = -\exp(-\frac{1}{2}y^TS^{-1}y)S^{-1}(x - \mu)$
+   $\frac{\partial f}{\partial x} = -\frac{1}{2}\exp(-\frac{1}{2}y^TS^{-1}y) * (S^{-1} + S^{-T})(x - \mu)$
 
    The dimension of this derivative is $1 \times D$, the same as the dimension of $x$.
 
@@ -84,7 +84,7 @@ Compute the derivatives $\frac{df}{dx}$ of the following functions. Describe you
 
    $\frac{\partial f}{\partial x} = 2x$
 
-	   This is because the trace function is linear and its derivative is the transpose of the matrix inside the trace. The dimension of this derivative is $D \times 1$, the same as the dimension of $x$.
+	The dimension of this derivative is $1 \times D$.
 
 3. For the function $f = \tanh(z) \in \mathbb{R}^M$ where $z = Ax + b$, $x \in \mathbb{R}^N$, $A \in \mathbb{R}^{M \times N}$, and $b \in \mathbb{R}^M$, we again use the chain rule to compute the derivative.
 
@@ -92,9 +92,9 @@ Compute the derivatives $\frac{df}{dx}$ of the following functions. Describe you
 
    Applying the chain rule, we get:
 
-   $\frac{\partial f}{\partial x} = (1 - \tanh^2(Ax + b)) * A$
+   $\frac{\partial f}{\partial x} = diag(1 - \tanh^2(Ax + b)) * A$
 
-   Here, the $1 - \tanh^2(\cdot)$ function is applied element-wise to the vector $Ax + b$. The resulting derivative is a matrix of dimensions $M \times N$, the same as the dimension of $A$.
+   Here, the $1 - \tanh^2(\cdot)$ function is applied element-wise to the vector $Ax + b$. The resulting derivative is a matrix of dimensions $M \times N$, the same as the dimension of $A$, with the same reasoning of an above exercise.
 
 ## Exercise 5.9
 We define 
@@ -103,16 +103,9 @@ $$z := t(\epsilon,\nu)$$
 for differentiable functions $p,q,t$ and $x \in R^D,z \in R^E,\nu \in R^F,\epsilon \in R^G$. By using the chain rule, compute the gradient:
 $$\frac{d}{d\nu}g(x,z,\nu)$$
 
-The derivative of $\log p(x, z)$ with respect to $\nu$ is zero, because this term does not depend on $\nu$. 
-
-Then, the derivative of $-\log q(z, \nu)$ with respect to $z$ is $-\frac{1}{q(z, \nu)} \frac{\partial q(z, \nu)}{\partial z}$ and the derivative of $z = t(\epsilon, \nu)$ with respect to $\nu$ is $\frac{\partial t(\epsilon, \nu)}{\partial \nu}$. 
+The derivative of $\log p(x, z)$ with respect to $z$ is $\frac{1}{p(x,z)} \frac{\partial p(x,z)}{\partial z}$
+Then, the derivative of $-\log q(z, \nu)$ with respect to $z$ is $-\frac{1}{q(z, \nu)} \frac{\partial q(z, \nu)}{\partial z}$ and the derivative of $z = t(\epsilon, \nu)$ with respect to $\nu$ is $\frac{\partial t(\epsilon, \nu)}{\partial \nu}$.
 
 Applying the chain rule, we get:
 
-$\frac{\partial}{\partial \nu}(-\log q(z, \nu)) = -\frac{1}{q(z, \nu)} \frac{\partial q(z, \nu)}{\partial z} \frac{\partial t(\epsilon, \nu)}{\partial \nu}$
-
-So, the gradient of $g(x, z, \nu)$ with respect to $\nu$ is:
-
-$\frac{d}{d\nu}g(x, z, \nu) = 0 - \frac{1}{q(z, \nu)} \frac{\partial q(z, \nu)}{\partial z} \frac{\partial t(\epsilon, \nu)}{\partial \nu}$
-
-The dimension of this gradient is $F \times 1$, the same as the dimension of $\nu$.
+$\frac{d}{d\nu}g(x, z, \nu) = \frac{1}{p(x,z)} \frac{\partial p(x,z)}{\partial z}\frac{\partial t(\epsilon, \nu)}{\partial \nu} -\frac{1}{q(z, \nu)} \frac{\partial q(z, \nu)}{\partial z} \frac{\partial t(\epsilon, \nu)}{\partial \nu}$
